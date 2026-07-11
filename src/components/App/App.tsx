@@ -1,50 +1,71 @@
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useState } from "react";
-import { Toaster, toast } from "react-hot-toast";
-import type { Movie } from "@/types/movie";
-import SearchBar from "@/components/SearchBar";
-import MovieGrid from "@/components/MovieGrid";
-import Loader from "@/components/Loader";
-import ErrorMessage from "@/components/ErrorMessage";
-import MovieModal from "@/components/MovieModal";
-import MovieItem from "@/components/MovieItem";
-import fetchMovies from "@/services";
-import Pagination from "@/components/Pagination";
+import { useDebouncedCallback } from "use-debounce";
+// import { Toaster, toast } from "react-hot-toast";
+// import type { Movie } from "@/types/movie";
+// import SearchBar from "@/components/SearchBar";
+// import MovieGrid from "@/components/MovieGrid";
+// import Loader from "@/components/Loader";
+// import ErrorMessage from "@/components/ErrorMessage";
+// import MovieModal from "@/components/MovieModal";
+// import MovieItem from "@/components/MovieItem";
+// import fetchMovies from "@/services";
+// import Pagination from "@/components/Pagination";
+import fetchNotes from "@/services/noteService";
 import css from "./App.module.css";
 
 function App() {
-  const [query, setQuery] = useState("");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [totalPages, setTotalPages] = useState(5);
+  // const [query, setQuery] = useState("");
+  // const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+  // const [currentPage, setCurrentPage] = useState(1);
 
-  const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ["movies", query, currentPage],
-    queryFn: () => fetchMovies({ query, page: currentPage }),
-    enabled: !!query, // запрос выполняется только если есть строка поиска
+  const { data: notes, isFetching } = useQuery({
+    queryKey: ["notes", searchQuery, totalPages],
+    queryFn: () => fetchNotes({ searchQuery, totalPages }),
+
     placeholderData: keepPreviousData,
   });
 
-  const handleSearch = (newQuery: string) => {
-    setQuery(newQuery);
-    setCurrentPage(1);
-  };
+  const updateSearchQuery = useDebouncedCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value),
+    300,
+  );
 
-  const handleSelect = (movie: Movie) => {
-    setSelectedMovie(movie);
-    setIsModalOpen(true);
-  };
+  // const { data, isLoading, isError, isSuccess } = useQuery({
+  //   queryKey: ["movies", query, currentPage],
+  //   queryFn: () => fetchMovies({ query, page: currentPage }),
+  //   enabled: !!query, // запрос выполняется только если есть строка поиска
+  //   placeholderData: keepPreviousData,
+  // });
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setSelectedMovie(null);
-  };
+  // const handleSearch = (newQuery: string) => {
+  //   setQuery(newQuery);
+  //   setCurrentPage(1);
+  // };
 
-  const totalPages = data?.total_pages ?? 0;
+  // const handleSelect = (movie: Movie) => {
+  //   setSelectedMovie(movie);
+  //   setIsModalOpen(true);
+  // };
+
+  // const closeModal = () => {
+  //   setIsModalOpen(false);
+  //   setSelectedMovie(null);
+  // };
+
+  // const totalPages = data?.total_pages ?? 0;
 
   return (
-    <div className={css.container}>
-      <SearchBar onSubmit={handleSearch} />
+    <div className={css.app}>
+      <header className={css.toolbar}>
+        {/* Компонент SearchBox */}
+        {/* Пагінація */}
+        {/* Кнопка створення нотатки */}
+      </header>
+      {/* <SearchBar onSubmit={handleSearch} />
 
       {isSuccess && totalPages > 1 && (
         <Pagination
@@ -75,7 +96,7 @@ function App() {
         </MovieModal>
       )}
 
-      <Toaster position="top-center" reverseOrder={false} />
+      <Toaster position="top-center" reverseOrder={false} /> */}
     </div>
   );
 }
