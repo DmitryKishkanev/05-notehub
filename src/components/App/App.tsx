@@ -2,6 +2,8 @@ import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 // import { Toaster, toast } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
+import NoteForm from "@/components/NoteForm";
 // import type { Movie } from "@/types/movie";
 // import SearchBar from "@/components/SearchBar";
 // import MovieGrid from "@/components/MovieGrid";
@@ -14,8 +16,14 @@ import { useDebouncedCallback } from "use-debounce";
 import fetchNotes from "@/services/noteService";
 import css from "./App.module.css";
 
+interface NoteFormValues {
+  title: string;
+  content: string;
+  tag: string;
+}
+
 function App() {
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState({});
   const [totalPages, setTotalPages] = useState(5);
   // const [query, setQuery] = useState("");
   // const [isModalOpen, setIsModalOpen] = useState(false);
@@ -24,13 +32,18 @@ function App() {
 
   const { data: notes, isFetching } = useQuery({
     queryKey: ["notes", searchQuery, totalPages],
-    queryFn: () => fetchNotes({ searchQuery, totalPages }),
+    queryFn: () =>
+      fetchNotes({
+        search: searchQuery.title,
+        tag: searchQuery.tag,
+        totalPages,
+      }),
 
     placeholderData: keepPreviousData,
   });
 
   const updateSearchQuery = useDebouncedCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value),
+    (values: NoteFormValues) => setSearchQuery(values),
     300,
   );
 
@@ -65,6 +78,8 @@ function App() {
         {/* Пагінація */}
         {/* Кнопка створення нотатки */}
       </header>
+
+      <NoteForm onSubmit={updateSearchQuery} />
       {/* <SearchBar onSubmit={handleSearch} />
 
       {isSuccess && totalPages > 1 && (
@@ -97,6 +112,7 @@ function App() {
       )}
 
       <Toaster position="top-center" reverseOrder={false} /> */}
+      <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
 }
