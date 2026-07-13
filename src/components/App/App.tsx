@@ -3,7 +3,8 @@ import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
 // import { Toaster, toast } from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
-import NoteForm from "@/components/NoteForm";
+// import NoteForm from "@/components/NoteForm";
+import NoteList from "@/components/NoteList";
 // import type { Movie } from "@/types/movie";
 // import SearchBar from "@/components/SearchBar";
 // import MovieGrid from "@/components/MovieGrid";
@@ -12,8 +13,8 @@ import NoteForm from "@/components/NoteForm";
 // import MovieModal from "@/components/MovieModal";
 // import MovieItem from "@/components/MovieItem";
 // import fetchMovies from "@/services";
-// import Pagination from "@/components/Pagination";
-import fetchNotes from "@/services/noteService";
+import Pagination from "@/components/Pagination";
+import noteService from "@/services/noteService";
 import css from "./App.module.css";
 
 interface NoteFormValues {
@@ -23,29 +24,33 @@ interface NoteFormValues {
 }
 
 function App() {
-  const [searchQuery, setSearchQuery] = useState({});
-  const [totalPages, setTotalPages] = useState(5);
+  const [searchQuery, setSearchQuery] = useState<NoteFormValues>({
+    title: "",
+    content: "",
+    tag: "Todo",
+  });
+  // const [totalPages, setTotalPages] = useState(5);
   // const [query, setQuery] = useState("");
   // const [isModalOpen, setIsModalOpen] = useState(false);
   // const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
-  // const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
 
-  const { data: notes, isFetching } = useQuery({
-    queryKey: ["notes", searchQuery, totalPages],
+  const { data, isFetching } = useQuery({
+    queryKey: ["notes", searchQuery, currentPage],
     queryFn: () =>
-      fetchNotes({
+      noteService.fetchNotes({
         search: searchQuery.title,
         tag: searchQuery.tag,
-        totalPages,
+        page: currentPage,
+        perPage: 12,
       }),
 
     placeholderData: keepPreviousData,
   });
 
-  const updateSearchQuery = useDebouncedCallback(
-    (values: NoteFormValues) => setSearchQuery(values),
-    300,
-  );
+  const updateSearchQuery = useDebouncedCallback((values: NoteFormValues) => {
+    (setSearchQuery(values), setCurrentPage(1));
+  }, 300);
 
   // const { data, isLoading, isError, isSuccess } = useQuery({
   //   queryKey: ["movies", query, currentPage],
@@ -78,8 +83,20 @@ function App() {
         {/* Пагінація */}
         {/* Кнопка створення нотатки */}
       </header>
-
-      <NoteForm onSubmit={updateSearchQuery} />
+      {/* <NoteForm onSubmit={updateSearchQuery} /> */}
+      {isFetching && <div>Loading posts...</div>}
+      {data && (
+        <>
+          <NoteList notes={data.notes} />
+          {data.totalPages > 1 && (
+            <Pagination
+              totalPages={data.totalPages}
+              currentPage={currentPage}
+              onPageChange={setCurrentPage}
+            />
+          )}
+        </>
+      )}
       {/* <SearchBar onSubmit={handleSearch} />
 
       {isSuccess && totalPages > 1 && (
