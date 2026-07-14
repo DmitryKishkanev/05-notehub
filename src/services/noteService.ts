@@ -5,16 +5,8 @@ const BASE_URL = "https://notehub-public.goit.study/api";
 const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
 
 interface FetchNotesParams {
-  search: string;
-  tag: string;
   page?: number;
   perPage?: number;
-  sortBy?: string;
-}
-
-interface NotesHttpResponse {
-  notes: Note[];
-  totalPages: number;
 }
 
 interface FetchNotesResult {
@@ -36,13 +28,12 @@ interface Patch {
 
 // READ: список заметок
 async function fetchNotes(params: FetchNotesParams): Promise<FetchNotesResult> {
-  const response = await axios.get<NotesHttpResponse>(`${BASE_URL}/notes`, {
+  const response = await axios.get<FetchNotesResult>(`${BASE_URL}/notes`, {
     params,
     headers: { Authorization: `Bearer ${myKey}` },
   });
 
   const { notes, totalPages } = response.data;
-
   return {
     notes,
     totalPages,
