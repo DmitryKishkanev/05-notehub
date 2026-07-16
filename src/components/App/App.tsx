@@ -6,26 +6,24 @@ import {
 } from "@tanstack/react-query";
 import { useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import type { NoteFormValues } from "@/types/note";
 // import { Toaster, toast } from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
 import NoteList from "@/components/NoteList";
 import Pagination from "@/components/Pagination";
 import Modal from "@/components/Modal";
 import NoteForm from "@/components/NoteForm";
-import noteService from "@/services/noteService";
-import css from "./App.module.css";
+import noteService from "@/services";
+import SearchBox from "@/components/SearchBox";
 
-interface NoteFormValues {
-  title: string;
-  content: string;
-  tag: string;
-}
+import css from "./App.module.css";
 
 function App() {
   const [searchQuery, setSearchQuery] = useState<NoteFormValues>({
     title: "",
     content: "",
     tag: "",
+    search: "",
   });
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,6 +33,7 @@ function App() {
     queryKey: ["notes", searchQuery, currentPage],
     queryFn: () =>
       noteService.fetchNotes({
+        search: searchQuery.search,
         page: currentPage,
         perPage: 12,
       }),
@@ -81,7 +80,8 @@ function App() {
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        {/* Компонент SearchBox */}
+        {<SearchBox searchQuery={searchQuery} onSearch={updateSearchQuery} />}
+
         {isSuccess && totalPages > 1 && (
           <Pagination
             totalPages={data.totalPages}
@@ -100,11 +100,7 @@ function App() {
 
       {isModalOpen && (
         <Modal onClose={closeModal}>
-          <NoteForm
-            onSubmit={updateSearchQuery}
-            onClose={closeModal}
-            onCreate={handleCreateNote}
-          />
+          <NoteForm onClose={closeModal} onCreate={handleCreateNote} />
         </Modal>
       )}
 

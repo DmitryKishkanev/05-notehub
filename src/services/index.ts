@@ -1,1 +1,1 @@
-export { default } from "@/services/movieService";
+export { default } from "@/services/noteService";

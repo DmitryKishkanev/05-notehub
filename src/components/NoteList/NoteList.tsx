@@ -1,5 +1,4 @@
 import type { Note } from "@/types/note";
-// import noImage from "@/assets/no-image.jpg";
 import css from "./NoteList.module.css";
 
 interface NoteListProps {

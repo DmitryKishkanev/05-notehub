@@ -3,24 +3,18 @@ import type { FormikHelpers } from "formik";
 import { useId } from "react";
 import * as Yup from "yup";
 import toast from "react-hot-toast";
+import type { NoteFormValues } from "@/types/note";
 import css from "./NoteForm.module.css";
 
 interface NoteFormProps {
-  onSubmit: (query: NoteFormValues) => void;
   onClose: () => void;
   onCreate: (values: NoteFormValues) => void;
-}
-
-interface NoteFormValues {
-  title: string;
-  content: string;
-  tag: string;
 }
 
 const initialValues: NoteFormValues = {
   title: "",
   content: "",
-  tag: "Todo",
+  tag: "",
 };
 
 const validationSchema = Yup.object().shape({
@@ -37,7 +31,7 @@ const validationSchema = Yup.object().shape({
 });
 
 export default function NoteForm({
-  onSubmit,
+  // onSubmit,
   onClose,
   onCreate,
 }: NoteFormProps) {
@@ -69,7 +63,7 @@ export default function NoteForm({
       }
 
       onCreate(values);
-      onSubmit(values);
+      // onSubmit(values);
       resetForm();
       onClose();
     }

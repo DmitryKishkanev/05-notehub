@@ -5,6 +5,7 @@ const BASE_URL = "https://notehub-public.goit.study/api";
 const myKey = import.meta.env.VITE_NOTEHUB_TOKEN;
 
 interface FetchNotesParams {
+  search?: string;
   page?: number;
   perPage?: number;
 }
@@ -33,11 +34,7 @@ async function fetchNotes(params: FetchNotesParams): Promise<FetchNotesResult> {
     headers: { Authorization: `Bearer ${myKey}` },
   });
 
-  const { notes, totalPages } = response.data;
-  return {
-    notes,
-    totalPages,
-  };
+  return response.data;
 }
 
 // READ: одна заметка
@@ -45,6 +42,7 @@ async function fetchNote(id: string): Promise<Note> {
   const response = await axios.get<Note>(`${BASE_URL}/notes/${id}`, {
     headers: { Authorization: `Bearer ${myKey}` },
   });
+
   return response.data;
 }
 
@@ -56,6 +54,7 @@ async function createNote(newNote: Post): Promise<Note> {
       Authorization: `Bearer ${myKey}`,
     },
   });
+
   return response.data;
 }
 
@@ -67,6 +66,7 @@ async function updateNote(id: string, patch: Patch): Promise<Note> {
       Authorization: `Bearer ${myKey}`,
     },
   });
+
   return response.data;
 }
 
@@ -75,6 +75,7 @@ async function deleteNote(id: string): Promise<Note> {
   const response = await axios.delete<Note>(`${BASE_URL}/notes/${id}`, {
     headers: { Authorization: `Bearer ${myKey}` },
   });
+
   return response.data;
 }
 
